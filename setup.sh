@@ -4,8 +4,8 @@
 echo "Setting up Document Processing Pipeline..."
 
 # Create project directory
-mkdir -p document-processor
-cd document-processor
+mkdir -p aggregate
+cd aggregate
 
 # Check if running on Linux or macOS
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then

@@ -41,8 +41,8 @@ brew install tesseract poppler cairo
 ### Quick Setup
 ```bash
 # Clone or download the project files
-git clone <repository-url>
-cd document-processor
+git clone https://github.com/veridock/aggregate.git
+cd aggregate
 
 # Install dependencies
 make install
@@ -105,7 +105,7 @@ python processor.py --step aggregate
 ## 📁 Project Structure
 
 ```
-document-processor/
+aggregate/
 ├── Makefile                 # Build automation
 ├── processor.py            # Main processing pipeline
 ├── requirements.txt        # Python dependencies
