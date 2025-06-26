@@ -1,29 +1,40 @@
 """PDF conversion utilities."""
 
 import base64
+import io
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
+
+from PIL import Image
 from typing_extensions import TypedDict
 
-from pdf2image import convert_from_path
+# cairosvg doesn't have type stubs
+import cairosvg  # type: ignore[import-untyped]
 
 
-def pdf_to_svg(pdf_file: Path, output_dir: Path) -> Tuple[Path, Dict[str, Any]]:
+def pdf_to_svg(
+    pdf_file: Union[str, Path],
+    output_dir: Union[str, Path],
+) -> Tuple[Path, Dict[str, Any]]:
     """Convert PDF to SVG with embedded data and metadata.
-    
+
     Args:
-        pdf_file: Path to the input PDF file
+        pdf_file: Path or string to the input PDF file
         output_dir: Directory to save the output SVG
-        
+
     Returns:
         Tuple of (output_svg_path, metadata_dict)
     """
+    # Convert to Path objects if they are strings
+    pdf_path = Path(pdf_file) if isinstance(pdf_file, str) else pdf_file
+    output_dir = Path(output_dir) if isinstance(output_dir, str) else output_dir
+    
     # Ensure output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Create output path
-    output_path = output_dir / f"{pdf_file.stem}.svg"
+    output_path = output_dir / f"{pdf_path.stem}.svg"
     
     # Read PDF as base64
     with open(pdf_file, 'rb') as f:
@@ -33,7 +44,8 @@ def pdf_to_svg(pdf_file: Path, output_dir: Path) -> Tuple[Path, Dict[str, Any]]:
     metadata = {
         "file": str(output_path),
         "pdf_embedded": True,
-        "pages": []
+        "pages": [],
+        "total_pages": 1  # Default to 1 page, can be updated if we have page count
     }
     
     # Create SVG with embedded PDF data
@@ -90,48 +102,61 @@ class PageInfo(TypedDict):
 
 
 def svg_to_png(
-    svg_file: Path, 
-    metadata: Dict[str, Any], 
-    output_dir: Path
-) -> Tuple[List[PageInfo], Dict[str, Any]]:
-    """Convert SVG with embedded PDF to PNG images.
-    
+    svg_file: Union[str, Path],
+    metadata: Dict[str, Any],
+    output_dir: Union[str, Path],
+) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """Convert SVG to PNG images.
+
     Args:
-        svg_file: Path to the input SVG file
+        svg_file: Path or string to the input SVG file
         metadata: Metadata from the PDF to SVG conversion
         output_dir: Directory to save the output PNG files
-        
+
     Returns:
         Tuple of (list of page info dicts, updated metadata)
     """
+    # Convert to Path objects if they are strings
+    svg_file = Path(svg_file) if isinstance(svg_file, str) else svg_file
+    output_dir = Path(output_dir) if isinstance(
+        output_dir, str
+    ) else output_dir
+
     # Ensure output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     try:
-        # Convert PDF to images (one per page) using pdf2image
-        images = convert_from_path(
-            str(svg_file),
-            output_folder=str(output_dir),
-            fmt='png',
-            output_file=svg_file.stem,
-            paths_only=True
-        )
-        
-        # Update metadata with page information
-        pages: List[PageInfo] = []
-        for i, img_path in enumerate(images, 1):
-            page_info: PageInfo = {
-                'page': i,
-                'file': str(img_path) if isinstance(img_path, Path) else str(img_path),
-                'width': 800,  # Default width
-                'height': 1000  # Default height
+        # Create output filename
+        output_path = output_dir / f"{svg_file.stem}.png"
+        svg_path = str(svg_file.absolute())
+
+        # Convert SVG to PNG using cairosvg
+        png_data = cairosvg.svg2png(url=svg_path)
+
+        # Save the PNG data to a file and get dimensions
+        with open(output_path, 'wb') as f:
+            f.write(png_data)
+        with Image.open(io.BytesIO(png_data)) as img:
+            width, height = img.size
+
+        # Create and update page info
+        page_info = [
+            {
+                "page": 1,
+                "file": str(output_path.absolute()),
+                "width": width,
+                "height": height,
+            },
+        ]
+        metadata.update(
+            {
+                "pages": page_info,
+                "converted_at": datetime.now().isoformat(),
             }
-            pages.append(page_info)
-        
-        metadata['pages'] = pages
-        return pages, metadata
-        
+        )
+
+        print(f"Created: {output_path}")
+        return page_info, metadata
+
     except Exception as e:
-        print(f"Error converting SVG to PNG: {e}")
-        # Return empty pages list on error
-        return [], metadata
+        raise RuntimeError(f"Failed to convert SVG to PNG: {str(e)}")

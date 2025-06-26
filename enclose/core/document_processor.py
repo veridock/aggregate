@@ -14,7 +14,7 @@ from datetime import datetime
 from ..converters.markdown_converter import create_example_markdown, markdown_to_pdf
 from ..converters.pdf_converter import pdf_to_svg, svg_to_png
 from ..utils.ocr_processor import process_ocr
-from ..utils.file_utils import search_svg_files
+from ..utils.file_utils import search_svg_files as utils_search_svg_files
 from ..utils.html_utils import enclose_to_html_table
 from ..utils.metadata_utils import save_metadata
 
@@ -103,7 +103,7 @@ class DocumentProcessor:
         """Create an example markdown file."""
         return Path(create_example_markdown(self.output_dir))
 
-    def markdown_to_pdf(self, md_file: Union[str, Path], output_path: Optional[Union[str, Path]] = None) -> str:
+    def markdown_to_pdf(self, md_file: Union[str, Path], output_path: Optional[Union[str, Path]] = None) -> Path:
         """
         Convert markdown to PDF.
         
@@ -127,8 +127,9 @@ class DocumentProcessor:
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Use the markdown_to_pdf function from converters
-        return markdown_to_pdf(str(md_file), str(output_dir), output_filename)
+        # Use the markdown_to_pdf function from converters and convert the result to Path
+        pdf_path = markdown_to_pdf(str(md_file), str(output_dir), output_filename)
+        return Path(pdf_path)
 
     def pdf_to_svg(self, pdf_file: Union[str, Path]) -> tuple[str, Dict[str, Any]]:
         """Convert PDF to SVG with embedded data and metadata."""
@@ -147,6 +148,9 @@ class DocumentProcessor:
                    metadata: Dict[str, Any]) -> Dict[str, Any]:
         """Process PNG files with OCR and update metadata."""
         updated_metadata = process_ocr([str(f) for f in png_files], metadata)
+        # Rename 'ocr_results' to 'ocr_data' to match test expectations
+        if 'ocr_results' in updated_metadata:
+            updated_metadata['ocr_data'] = updated_metadata.pop('ocr_results')
         self.metadata.update(updated_metadata)
         return self.metadata
     
@@ -186,6 +190,20 @@ class DocumentProcessor:
             json.dump(self.metadata, f, indent=2)
             
         return str(output_file)
+    
+    def search_svg_files(self, search_path: Optional[Union[str, Path]] = None) -> List[Dict[str, Any]]:
+        """
+        Search for SVG files in the specified directory and return their metadata.
+        
+        Args:
+            search_path: Directory to search for SVG files (defaults to output_dir)
+            
+        Returns:
+            List of dictionaries containing SVG file metadata
+        """
+        if search_path is None:
+            search_path = self.output_dir
+        return utils_search_svg_files(search_path)
     
     def enclose_to_html_table(self, svg_files: List[Union[str, Path]]) -> str:
         """

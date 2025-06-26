@@ -2,6 +2,15 @@
 venv
 poetry.lock
 output
+.md
+.pdf
+.png
+.jpeg
+.jpg
+.gif
+.tiff
+.tiff.gz
+.svg
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

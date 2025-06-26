@@ -36,16 +36,17 @@ def test_svg_to_png(example_markdown_file, temp_output_dir):
     svg_path, metadata = pdf_to_svg(pdf_file, temp_output_dir)
     
     # Convert SVG to PNG
-    png_files, updated_metadata = svg_to_png(svg_path, metadata, temp_output_dir)
+    page_info, updated_metadata = svg_to_png(svg_path, metadata, temp_output_dir)
     
     # Check if PNG files were created
-    assert len(png_files) > 0
-    for png_info in png_files:
+    assert len(page_info) > 0
+    for png_info in page_info:
         png_path = Path(png_info["file"])
         assert png_path.exists()
         assert png_path.suffix == ".png"
         assert png_path.stat().st_size > 0
     
     # Check metadata was updated
-    assert len(updated_metadata["pages"]) == len(png_files)
-    assert updated_metadata["total_pages"] == len(png_files)
+    assert len(updated_metadata["pages"]) == len(page_info)
+    assert "converted_at" in updated_metadata
+    assert updated_metadata["total_pages"] == len(page_info)

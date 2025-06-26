@@ -24,7 +24,8 @@ def test_create_example_markdown(temp_output_dir):
 def test_markdown_to_pdf(example_markdown_file, temp_output_dir):
     """Test converting markdown to PDF."""
     # Convert markdown to PDF
-    pdf_file = markdown_to_pdf(example_markdown_file, temp_output_dir)
+    pdf_path = markdown_to_pdf(example_markdown_file, temp_output_dir)
+    pdf_file = Path(pdf_path)  # Convert string path to Path object
     
     # Check if PDF was created
     assert pdf_file.exists()

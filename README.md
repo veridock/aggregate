@@ -40,11 +40,158 @@ graph LR
 - **Metadata tracking**: Preserve and enhance metadata throughout processing
 - **Interactive dashboard**: View and search processed documents
 
+## ✅ File Format Validation
+
+Enclose includes comprehensive file format validation to ensure the integrity and correctness of all converted files:
+
+```mermaid
+graph TD
+    A[Input Validation] --> B[Conversion]
+    B --> C[Output Validation]
+    C --> D[Verification]
+    
+    style A fill:#d4f1f9,stroke:#333
+    style C fill:#d4f1f9,stroke:#333
+    style D fill:#d4f1f9,stroke:#333
+```
+
+### Validation Checks
+
+#### PDF Files
+- ✅ Valid PDF signature (`%PDF` header)
+- ✅ Correct MIME type (`application/pdf`)
+- ✅ File integrity verification
+
+#### SVG Files
+- ✅ Valid XML structure
+- ✅ Correct MIME type (`image/svg+xml`)
+- ✅ Basic SVG tag validation
+
+#### PNG Files
+- ✅ Valid PNG signature (magic bytes)
+- ✅ Correct MIME type (`image/png`)
+- ✅ Image data integrity check
+- ✅ PIL verification of image data
+
+### Example Validation Output
+
+```bash
+# When running tests, you'll see validation output like:
+PASSED tests/test_file_formats.py::test_pdf_conversion
+PASSED tests/test_file_formats.py::test_svg_conversion
+PASSED tests/test_file_formats.py::test_png_conversion
+```
+
 ## 📚 Documentation
 
 For complete documentation, please visit our [documentation site](docs/index.md).
 
 ## 🛠️ Quick Start
+
+### Prerequisites
+
+- Python 3.8+
+- [Poetry](https://python-poetry.org/) (for development)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/enclose.git
+   cd enclose
+   ```
+
+2. Install dependencies:
+   ```bash
+   poetry install
+   ```
+
+3. Install the package in development mode:
+   ```bash
+   poetry install
+   ```
+
+### Basic Usage
+
+1. **List supported formats**:
+   ```bash
+   enclose --list
+   ```
+
+2. **Convert a markdown file to another format**:
+   ```bash
+   # Basic conversion (outputs to current directory with default name)
+   enclose example.md pdf
+   
+   # Specify output filename
+   enclose example.md pdf -o output.pdf
+   
+   # Convert to SVG
+   enclose example.md svg -o output.svg
+   
+   # Convert to PNG
+   enclose example.md png -o output.png
+   
+   # Convert to HTML
+   enclose example.md html -o output.html
+   ```
+
+### Example
+
+1. First, create a test markdown file or use the provided `example.md`
+
+2. Convert it to different formats:
+   ```bash
+   # Convert to PDF
+   enclose example.md pdf -o example.pdf
+   
+   # Convert to SVG
+   enclose example.md svg -o example.svg
+   ```
+
+### Important Notes
+
+- The `-o` or `--output` flag requires a full file path with extension (e.g., `output.pdf`, `./output.svg`)
+- If no output is specified, the output will be saved in the current directory with a default name based on the input file
+- The output directory must exist before running the command
+
+3. The output will be saved to `output/example.pdf`
+
+### Command Line Options
+
+```
+usage: enclose [-h] [--version] [--list] [-o OUTPUT] [input] [{pdf,png,svg,html}]
+
+A document processing tool for format conversion.
+
+positional arguments:
+  input                 Input file path (markdown, pdf, etc.)
+  {pdf,png,svg,html}    Output format
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --list                List supported formats and conversions
+  -o OUTPUT, --output OUTPUT
+                        Output directory (default: current directory)
+```
+
+### Development
+
+To run tests:
+```bash
+make test
+```
+
+To run linting:
+```bash
+make lint
+```
+
+To run type checking:
+```bash
+make typecheck
+```
 
 ### Prerequisites
 
