@@ -71,7 +71,7 @@ install:
 # Install development dependencies
 install-dev:
 	@echo -e "$(BLUE)Installing development dependencies...$(NC)"
-	poetry add --group dev \
+	poetry add --enclose dev \
 		"black>=22.3.0,<23.0.0" \
 		"isort>=5.10.1,<6.0.0" \
 		"flake8>=5.0.0,<6.0.0" \
