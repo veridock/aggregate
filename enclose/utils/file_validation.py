@@ -2,13 +2,13 @@
 File validation utilities.
 """
 import os
-import magic
+import filetype
 from pathlib import Path
-from typing import Dict, Tuple, Optional, Union
+from typing import Dict, Tuple, Optional, Union, Any
 
 def get_file_mime_type(file_path: Union[str, Path]) -> str:
     """
-    Get the MIME type of a file.
+    Get the MIME type of a file using filetype.
     
     Args:
         file_path: Path to the file
@@ -17,8 +17,16 @@ def get_file_mime_type(file_path: Union[str, Path]) -> str:
         MIME type as a string (e.g., 'application/pdf')
     """
     try:
-        mime = magic.Magic(mime=True)
-        return mime.from_file(str(file_path))
+        kind = filetype.guess(str(file_path))
+        if kind is None:
+            # For text files, return text/plain
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    f.read(1024)  # Try to read a bit to check if it's text
+                return 'text/plain'
+            except:
+                return 'application/octet-stream'
+        return kind.mime
     except Exception as e:
         return f"error: {str(e)}"
 
@@ -35,30 +43,47 @@ def validate_file_signature(file_path: Union[str, Path], expected_type: str) -> 
     """
     if not os.path.exists(file_path):
         return False, f"File does not exist: {file_path}"
+    
+    # Special handling for SVG files since they're XML
+    if expected_type.lower() == 'svg':
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read(1024).lower()
+                if '<!doctype svg' in content or '<svg' in content:
+                    return True, "Valid SVG file: image/svg+xml"
+                return False, "Invalid SVG file: Missing SVG/XML declaration"
+        except Exception as e:
+            return False, f"Error reading SVG file: {str(e)}"
+    
+    # For other file types, use filetype
+    try:
+        kind = filetype.guess(str(file_path))
+        if kind is None:
+            return False, f"Could not determine file type"
         
-    mime_type = get_file_mime_type(file_path)
-    
-    # Map of expected MIME types for each file extension
-    expected_mime_types = {
-        'pdf': 'application/pdf',
-        'svg': 'image/svg+xml',
-        'png': 'image/png',
-        'jpeg': 'image/jpeg',
-        'jpg': 'image/jpeg',
-        'html': 'text/html',
-        'txt': 'text/plain',
-        'md': 'text/markdown'
-    }
-    
-    expected_mime = expected_mime_types.get(expected_type.lower())
-    
-    if not expected_mime:
-        return False, f"Unsupported file type for validation: {expected_type}"
-    
-    if mime_type == expected_mime:
-        return True, f"Valid {expected_type.upper()} file: {mime_type}"
-    else:
-        return False, f"Invalid {expected_type.upper()} file. Expected {expected_mime}, got {mime_type}"
+        # Map of expected MIME types for each file extension
+        expected_mime_types = {
+            'pdf': 'application/pdf',
+            'svg': 'image/svg+xml',
+            'png': 'image/png',
+            'jpeg': 'image/jpeg',
+            'jpg': 'image/jpeg',
+            'html': 'text/html',
+            'txt': 'text/plain',
+            'md': 'text/markdown'
+        }
+        
+        expected_mime = expected_mime_types.get(expected_type.lower())
+        
+        if not expected_mime:
+            return False, f"Unsupported file type for validation: {expected_type}"
+        
+        if kind.mime == expected_mime:
+            return True, f"Valid {expected_type.upper()} file: {kind.mime}"
+        else:
+            return False, f"Invalid {expected_type.upper()} file. Expected {expected_mime}, got {kind.mime}"
+    except Exception as e:
+        return False, f"Error validating file: {str(e)}"
 
 def validate_converted_file(file_path: Union[str, Path], original_path: Optional[Union[str, Path]] = None) -> Dict[str, str]:
     """
