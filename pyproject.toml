@@ -1,6 +1,6 @@
 [project]
-name = "enclose"
-version = "0.1.7"
+name = "enter"
+version = "0.1.8"
 description = "Data aggregation tool"
 authors = [
     { name = "Tom", email = "info@softreck.dev" }
@@ -11,7 +11,7 @@ requires-python = ">=3.8"
 homepage = "http://www.veridock.com"
 
 [project.scripts]
-enclose = "enclose.__main__:main"
+enter = "enter.__main__:main"
 
 [project.optional-dependencies]
 test = [
