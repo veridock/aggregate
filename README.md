@@ -1,6 +1,6 @@
-# Document Processing Pipeline
+# Enclose
 
-A comprehensive document processing system that converts Markdown files through a complete pipeline: Markdown → PDF → SVG → PNG → OCR → Search → Dashboard.
+A modular document processing pipeline for Markdown to PDF/SVG/PNG conversion with OCR capabilities.
 
 ## 🏗️ Refactored Package Structure
 
@@ -65,37 +65,45 @@ brew install tesseract poppler cairo
 - Install [Poppler](https://poppler.freedesktop.org/)
 
 ### Python Requirements
-- Python 3.7+
-- pip3
+- Python 3.8.1+
+- [Poetry](https://python-poetry.org/) for dependency management
 
 ## 🛠️ Installation
 
-### Quick Setup
+### Using Make (Recommended)
 ```bash
-# Clone or download the project files
+# Clone the repository
 git clone https://github.com/veridock/enclose.git
 cd enclose
 
-# Install dependencies
+# Install the package in development mode
 make install
 ```
 
-### Manual Setup
+### Using Poetry Directly
 ```bash
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Install dependencies
+poetry install
 
-# Install Python packages
-pip install -r requirements.txt
+# Activate the virtual environment
+poetry shell
 ```
 
 ## 🎯 Usage
 
 ### Quick Start
 ```bash
-# Run complete pipeline
-make all
+# Process documents
+enclose process input.md output/
+
+# Run tests
+make test
+
+# Format code
+make format
+
+# Check code quality
+make lint
 ```
 
 ### Step-by-Step Execution
