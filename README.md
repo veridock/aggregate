@@ -2,6 +2,38 @@
 
 A comprehensive document processing system that converts Markdown files through a complete pipeline: Markdown → PDF → SVG → PNG → OCR → Search → Dashboard.
 
+## 🏗️ Refactored Package Structure
+
+The codebase has been restructured into a modular Python package:
+
+```
+processor/
+├── __init__.py          # Package initialization
+├── __main__.py          # CLI entry point
+├── core/
+│   ├── __init__.py
+│   └── document_processor.py  # Main processor class
+├── converters/
+│   ├── __init__.py
+│   ├── markdown_converter.py  # Markdown to PDF conversion
+│   └── pdf_converter.py       # PDF to SVG/PNG conversion
+└── utils/
+    ├── __init__.py
+    ├── ocr_processor.py       # OCR processing
+    ├── file_utils.py          # File operations
+    ├── html_utils.py          # HTML generation
+    └── metadata_utils.py      # Metadata handling
+```
+
+This modular structure provides better:
+- Code organization and maintainability
+- Separation of concerns
+- Testability
+- Reusability of components
+- Easier extension of functionality
+
+A comprehensive document processing system that converts Markdown files through a complete pipeline: Markdown → PDF → SVG → PNG → OCR → Search → Dashboard.
+
 ## 🚀 Features
 
 - **Multi-format conversion**: Markdown to PDF with styling
