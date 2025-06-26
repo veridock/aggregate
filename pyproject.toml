@@ -4,12 +4,12 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "enclose"
-version = "1.0.2"
+version = "1.0.4"
 description = "A modular document processing pipeline for Markdown to PDF/SVG/PNG conversion with OCR"
 authors = ["Tom <info@softreck.dev>"]
 readme = "README.md"
-license = "MIT"
-homepage = "https://github.com/veridock/aggregate"
+license = "Apache-2.0"
+homepage = "https://github.com/veridock/enclose"
 packages = [
     { include = "enclose" },
 ]
