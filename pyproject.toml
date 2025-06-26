@@ -7,11 +7,11 @@ name = "enclose"
 version = "1.0.1"
 description = "A modular document processing pipeline for Markdown to PDF/SVG/PNG conversion with OCR"
 authors = [
-    { name = "Tom", email = "info@softreck.dev" }
+    { name = "Tom Sapletta", email = "info@softreck.dev" }
 ]
 requires-python = ">=3.8"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "Apache-2.0"}
 
 [project.urls]
 homepage = "https://github.com/veridock/enclose"
