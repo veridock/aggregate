@@ -41,11 +41,50 @@ def validate_file_signature(file_path: Union[str, Path], expected_type: str) -> 
     Returns:
         Tuple of (is_valid, message)
     """
-    if not os.path.exists(file_path):
+    file_path = Path(file_path)
+    if not file_path.exists():
         return False, f"File does not exist: {file_path}"
     
+    # Map of expected MIME types for each file extension
+    expected_mime_types = {
+        'pdf': 'application/pdf',
+        'svg': 'image/svg+xml',
+        'png': 'image/png',
+        'jpeg': 'image/jpeg',
+        'jpg': 'image/jpeg',
+        'html': 'text/html',
+        'txt': 'text/plain',
+        'md': 'text/markdown'
+    }
+    
+    expected_ext = expected_type.lower()
+    expected_mime = expected_mime_types.get(expected_ext)
+    
+    if not expected_mime:
+        return False, f"Unsupported file type for validation: {expected_type}"
+    
+    # Special handling for text-based formats
+    if expected_ext in ['html', 'md', 'txt']:
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read(1024).lower()
+                
+                # Check for HTML files
+                if expected_ext == 'html' and ('<!doctype html' in content or '<html' in content):
+                    return True, f"Valid HTML file: {expected_mime}"
+                # Check for Markdown files (simple check for common markdown patterns)
+                elif expected_ext == 'md' and any(c in content for c in ['# ', '## ', '* ', '- ']):
+                    return True, f"Valid Markdown file: {expected_mime}"
+                # For plain text, just check if it's readable
+                elif expected_ext == 'txt':
+                    return True, f"Valid text file: {expected_mime}"
+                    
+                return False, f"Invalid {expected_ext.upper()} file: Content doesn't match expected format"
+        except Exception as e:
+            return False, f"Error reading {expected_ext.upper()} file: {str(e)}"
+    
     # Special handling for SVG files since they're XML
-    if expected_type.lower() == 'svg':
+    if expected_ext == 'svg':
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read(1024).lower()
@@ -55,33 +94,21 @@ def validate_file_signature(file_path: Union[str, Path], expected_type: str) -> 
         except Exception as e:
             return False, f"Error reading SVG file: {str(e)}"
     
-    # For other file types, use filetype
+    # For binary file types, use filetype
     try:
         kind = filetype.guess(str(file_path))
         if kind is None:
-            return False, f"Could not determine file type"
-        
-        # Map of expected MIME types for each file extension
-        expected_mime_types = {
-            'pdf': 'application/pdf',
-            'svg': 'image/svg+xml',
-            'png': 'image/png',
-            'jpeg': 'image/jpeg',
-            'jpg': 'image/jpeg',
-            'html': 'text/html',
-            'txt': 'text/plain',
-            'md': 'text/markdown'
-        }
-        
-        expected_mime = expected_mime_types.get(expected_type.lower())
-        
-        if not expected_mime:
-            return False, f"Unsupported file type for validation: {expected_type}"
+            # If filetype can't determine the type, check if it's a valid file
+            if file_path.stat().st_size > 0:
+                return False, f"Could not determine file type"
+            return False, "File is empty"
         
         if kind.mime == expected_mime:
-            return True, f"Valid {expected_type.upper()} file: {kind.mime}"
+            return True, f"Valid {expected_ext.upper()} file: {kind.mime}"
         else:
-            return False, f"Invalid {expected_type.upper()} file. Expected {expected_mime}, got {kind.mime}"
+            return False, f"Invalid {expected_ext.upper()} file. Expected {expected_mime}, got {kind.mime}"
+    except Exception as e:
+        return False, f"Error validating file: {str(e)}"
     except Exception as e:
         return False, f"Error validating file: {str(e)}"
 
