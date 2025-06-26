@@ -3,7 +3,7 @@ Tests for markdown_converter module.
 """
 import pytest
 from pathlib import Path
-from processor.converters.markdown_converter import create_example_markdown, markdown_to_pdf
+from enclose.converters.markdown_converter import create_example_markdown, markdown_to_pdf
 
 
 def test_create_example_markdown(temp_output_dir):

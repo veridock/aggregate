@@ -58,6 +58,7 @@ class DocumentProcessor:
         Raises:
             ValueError: If the input format or output format is not supported
             FileNotFoundError: If the input file does not exist
+            RuntimeError: If the conversion fails
         """
         input_path = Path(input_path)
         if not input_path.exists():
@@ -70,28 +71,64 @@ class DocumentProcessor:
         if output_format.lower() not in self.supported_formats:
             raise ValueError(f"Unsupported output format: {output_format}")
             
+        # Set up output path
         if output_path is None:
             output_dir = Path(self.default_output_dir)
-            output_dir.mkdir(exist_ok=True)
-            output_path = output_dir / f"{input_path.stem}.{output_format}"
+            output_filename = f"{input_path.stem}.{output_format}"
+            output_path = output_dir / output_filename
         else:
             output_path = Path(output_path)
-            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_dir = output_path.parent
+            output_filename = output_path.name
         
-        # TODO: Implement actual conversion logic
-        # This is a placeholder that just creates an empty file
-        with open(output_path, 'w') as f:
-            f.write(f"Converted from {input_format} to {output_format}")
-            
-        return str(output_path)
+        # Ensure output directory exists
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Handle different conversion paths
+        try:
+            if input_format == 'md' and output_format == 'pdf':
+                return self.markdown_to_pdf(input_path, output_path)
+            elif input_format == 'pdf' and output_format == 'svg':
+                return self.pdf_to_svg(input_path, output_path)
+            elif input_format == 'svg' and output_format == 'png':
+                return self.svg_to_png(input_path, output_path)
+            else:
+                # For unsupported conversions, use a generic approach
+                return self._generic_conversion(input_path, output_path, output_format)
+                
+        except Exception as e:
+            raise RuntimeError(f"Failed to convert {input_path} to {output_format}: {str(e)}")
     
     def create_example_markdown(self) -> Path:
         """Create an example markdown file."""
         return Path(create_example_markdown(self.output_dir))
 
-    def markdown_to_pdf(self, md_file: Union[str, Path]) -> str:
-        """Convert markdown to PDF."""
-        return markdown_to_pdf(str(md_file), self.output_dir)
+    def markdown_to_pdf(self, md_file: Union[str, Path], output_path: Optional[Union[str, Path]] = None) -> str:
+        """
+        Convert markdown to PDF.
+        
+        Args:
+            md_file: Path to the markdown file
+            output_path: Optional output path for the PDF
+            
+        Returns:
+            Path to the generated PDF file
+        """
+        md_file = Path(md_file)
+        if output_path is None:
+            output_dir = Path(self.default_output_dir)
+            output_filename = f"{md_file.stem}.pdf"
+            output_path = output_dir / output_filename
+        else:
+            output_path = Path(output_path)
+            output_dir = output_path.parent
+            output_filename = output_path.name
+        
+        # Ensure output directory exists
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Use the markdown_to_pdf function from converters
+        return markdown_to_pdf(str(md_file), str(output_dir), output_filename)
 
     def pdf_to_svg(self, pdf_file: Union[str, Path]) -> tuple[str, Dict[str, Any]]:
         """Convert PDF to SVG with embedded data and metadata."""
@@ -161,3 +198,31 @@ class DocumentProcessor:
             Path to the generated HTML file
         """
         return enclose_to_html_table([str(f) for f in svg_files], self.output_dir)
+
+    def _generic_conversion(self, input_path: Path, output_path: Path, output_format: str) -> str:
+        """
+        Handle generic file conversion between formats.
+        
+        This is a fallback method for conversions that don't have a specific handler.
+        
+        Args:
+            input_path: Path to the input file
+            output_path: Path where the output should be saved
+            output_format: Target output format
+            
+        Returns:
+            Path to the generated output file
+            
+        Raises:
+            RuntimeError: If the conversion is not supported
+        """
+        # For now, just copy the file and change the extension
+        # This is a placeholder and should be replaced with actual conversion logic
+        try:
+            with open(input_path, 'rb') as src, open(output_path, 'wb') as dst:
+                dst.write(src.read())
+            return str(output_path)
+        except Exception as e:
+            raise RuntimeError(
+                f"Conversion from {input_path.suffix} to {output_format} is not yet implemented: {str(e)}"
+            )

@@ -18,6 +18,7 @@ resolve_script_path() {
 SCRIPT_DIR="$(resolve_script_path)"
 
 # The project root is the parent directory of the scripts directory
+# This ensures we can run the command from anywhere
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # Debug information (can be enabled by setting DEBUG=1)
@@ -69,7 +70,7 @@ run_enclose() {
     fi
     
     PYTHONPATH="$PROJECT_ROOT" \
-    "$PYTHON_BIN" -m processor.__main__ "$@"
+    "$PYTHON_BIN" -m enclose.__main__ "$@"
     local STATUS=$?
     
     # Change back to the original directory

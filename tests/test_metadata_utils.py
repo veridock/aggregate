@@ -3,7 +3,7 @@ Tests for metadata_utils module.
 """
 import json
 from pathlib import Path
-from processor.utils.metadata_utils import save_metadata
+from enclose.utils.metadata_utils import save_metadata
 
 
 def test_save_metadata(temp_output_dir):

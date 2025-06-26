@@ -11,7 +11,7 @@ readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/veridock/aggregate"
 packages = [
-    { include = "processor" },
+    { include = "enclose" },
 ]
 
 [tool.poetry.dependencies]
@@ -36,12 +36,12 @@ flake8 = "^6.1.0"
 mypy = "^1.4.1"
 
 [tool.poetry.scripts]
-enclose = "processor.__main__:main"
+enclose = "enclose.__main__:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
-addopts = "-v --cov=processor --cov-report=term-missing"
+addopts = "-v --cov=enclose --cov-report=term-missing"
 
 [tool.black]
 line-length = 88

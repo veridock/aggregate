@@ -3,9 +3,9 @@ Tests for ocr_processor module.
 """
 import pytest
 from pathlib import Path
-from processor.converters.markdown_converter import markdown_to_pdf
-from processor.converters.pdf_converter import pdf_to_svg, svg_to_png
-from processor.utils.ocr_processor import process_ocr
+from enclose.converters.markdown_converter import markdown_to_pdf
+from enclose.converters.pdf_converter import pdf_to_svg, svg_to_png
+from enclose.utils.ocr_processor import process_ocr
 
 
 def test_process_ocr(example_markdown_file, temp_output_dir):

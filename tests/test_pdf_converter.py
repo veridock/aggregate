@@ -4,8 +4,8 @@ Tests for pdf_converter module.
 import json
 import pytest
 from pathlib import Path
-from processor.converters.markdown_converter import markdown_to_pdf
-from processor.converters.pdf_converter import pdf_to_svg, svg_to_png
+from enclose.converters.markdown_converter import markdown_to_pdf
+from enclose.converters.pdf_converter import pdf_to_svg, svg_to_png
 
 
 def test_pdf_to_svg(example_markdown_file, temp_output_dir):

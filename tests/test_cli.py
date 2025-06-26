@@ -8,8 +8,8 @@ import pytest
 def test_cli_help():
     """Test the CLI help message."""
     # Test that the module can be imported
-    spec = find_spec('processor.__main__')
-    assert spec is not None, "Failed to find processor.__main__ module"
+    spec = find_spec('enclose.__main__')
+    assert spec is not None, "Failed to find enclose.__main__ module"
 
 
 def test_cli_list_command(capsys):

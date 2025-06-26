@@ -3,7 +3,7 @@ Tests for html_utils module.
 """
 import pytest
 from pathlib import Path
-from processor.utils.html_utils import enclose_to_html_table
+from enclose.utils.html_utils import enclose_to_html_table
 
 
 def test_enclose_to_html_table(temp_output_dir):

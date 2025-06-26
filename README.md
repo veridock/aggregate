@@ -15,11 +15,29 @@ graph LR
 
 ## 🚀 Features
 
-- **Multi-format conversion**: Markdown to PDF with styling
-- **SVG embedding**: PDF embedded as base64 data URI in SVG containers
-- **Image extraction**: PDF pages converted to PNG with base64 encoding
-- **OCR processing**: Text extraction with confidence scoring
-- **Metadata tracking**: JSON metadata throughout the pipeline
+```mermaid
+graph LR
+    A[Input Formats] --> B[Markdown]
+    A --> C[PDF]
+    
+    B --> D[Converters]
+    C --> D
+    
+    D --> E[Output Formats]
+    E --> F[PDF]
+    E --> G[SVG]
+    E --> H[PNG]
+    E --> I[HTML]
+    
+    style A fill:#f9f,stroke:#333
+    style E fill:#9f9,stroke:#333
+```
+
+- **Multi-format conversion**: Convert between Markdown, PDF, SVG, and PNG
+- **SVG embedding**: Embed PDFs as base64 data URIs in SVG containers
+- **Image extraction**: Extract high-quality images from PDFs
+- **OCR processing**: Extract text with confidence scoring
+- **Metadata tracking**: Preserve and enhance metadata throughout processing
 - **Interactive dashboard**: View and search processed documents
 
 ## 📚 Documentation
@@ -159,39 +177,159 @@ make lint
 
 ## 🛠️ CLI Commands
 
-```bash
-# Process a document
-enclose process input.md -o output/
+### Basic Usage
 
-# List supported formats
-enclose --list
+```bash
+# Convert a document
+enclose convert input.md pdf -o output/
+
+# List available formats
+enclose list-formats
 # Show help
 enclose --help
 ```
 
+### Command Structure
+
+```mermaid
+flowchart TD
+    A[enclose] --> B[convert]
+    A --> C[list-formats]
+    A --> D[--help]
+    
+    B --> E[input_file]
+    B --> F[output_format]
+    B --> G[options]
+    
+    G --> H[-o/--output]
+    G --> I[--dpi]
+    G --> J[--quality]
+    
+    style B fill:#9f9,stroke:#333
+    style C fill:#99f,stroke:#333
+```
+
+### Common Examples
+
+```bash
+# Convert Markdown to PDF
+enclose convert document.md pdf -o output/
+
+# Convert PDF to high-quality PNG
+enclose convert document.pdf png --dpi 300 -o images/
+
+
+# List all supported formats
+enclose list-formats
+```
+
+### Advanced Options
+
+```bash
+# Set output DPI for images
+enclose convert input.pdf png --dpi 150
+
+# Set image quality (1-100)
+enclose convert input.pdf jpg --quality 90
+
+# Process multiple files
+for f in *.md; do enclose convert "$f" pdf -o output/; done
+```
+
 ## 📁 Project Structure
 
+```mermaid
+graph TD
+    A[Project Root] --> B[Source Code]
+    A --> C[Documentation]
+    A --> D[Build System]
+    A --> E[Tests]
+    
+    B --> F[enclose/]:::dir
+    F --> G[__init__.py]:::file
+    F --> H[__main__.py]:::file
+    F --> I[core/]:::dir
+    F --> J[converters/]:::dir
+    F --> K[utils/]:::dir
+    
+    C --> L[docs/]:::dir
+    C --> M[README.md]:::file
+    
+    D --> N[pyproject.toml]:::file
+    D --> O[Makefile]:::file
+    
+    E --> P[tests/]:::dir
+    
+    classDef dir fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef file fill:#e8f5e9,stroke:#2e7d32,stroke-width:1.5px
 ```
-enclose/
-├── Makefile                 # Build automation
-├── pyproject.toml          # Project configuration and dependencies
-├── README.md               # Project documentation
-├── scripts/
-│   └── enclose            # Global CLI wrapper script
-├── processor/              # Main package
-│   ├── __init__.py
-│   ├── __main__.py         # CLI entry point
-│   ├── core/               # Core processing logic
-│   ├── converters/         # File format converters
-│   └── utils/              # Utility functions
-└── output/                 # Generated files (created on first run)
-    ├── example.md          # Example markdown
-    ├── example.pdf         # Generated PDF
-    ├── example.svg         # SVG with embedded PDF
-    ├── page_1.png         # Extracted PNG pages
-    ├── metadata.json       # Processing metadata
-    └── dashboard.html      # Interactive dashboard
+
+### Key Directories
+
+- `enclose/` - Main Python package
+  - `core/` - Core processing logic and document handling
+  - `converters/` - File format conversion modules
+  - `utils/` - Utility functions and helpers
+  - `__main__.py` - CLI entry point
+
+- `docs/` - Comprehensive documentation
+  - `getting-started/` - Installation and setup guides
+  - `architecture/` - System design and components
+  - `usage/` - User guides and examples
+
+- `tests/` - Test suite
+  - Unit tests
+  - Integration tests
+  - Test fixtures
+
+### Key Files
+
+- `pyproject.toml` - Project configuration and dependencies
+- `Makefile` - Common development tasks
+- `scripts/enclose` - Global CLI wrapper script
+- `.github/workflows/` - CI/CD pipelines
+
+## 🔄 Workflow
+
+```mermaid
+flowchart LR
+    A[Input] -->|Markdown/PDF| B(enclose)
+    B --> C{Format?}
+    
+    C -->|Markdown| D[Parse Markdown]
+    D --> E[Generate HTML]
+    E --> F[Convert to PDF]
+    
+    C -->|PDF| G[Process PDF]
+    G --> H[Extract Content]
+    
+    F & H --> I[Generate Outputs]
+    I --> J[SVG/PNG/HTML]
+    I --> K[Metadata]
+    J --> L[Dashboard]
+    
+    style A fill:#e3f2fd,stroke:#1565c0
+    style B fill:#e8f5e9,stroke#2e7d32
+    style L fill:#fff3e0,stroke:#e65100
 ```
+
+### Processing Steps
+
+1. **Input Handling**
+   - Accepts Markdown or PDF files
+   - Validates input format and content
+   
+2. **Conversion**
+   - Markdown → HTML → PDF
+   - PDF → Images/Text
+   
+3. **Output Generation**
+   - Generate SVG/PNG/HTML outputs
+   - Extract and process metadata
+   
+4. **Visualization**
+   - Create interactive dashboard
+   - Enable search and filtering
 
 ## 🔄 Pipeline Workflow
 

@@ -3,7 +3,7 @@ Tests for the DocumentProcessor class.
 """
 import pytest
 from pathlib import Path
-from processor.core.document_processor import DocumentProcessor
+from enclose.core.document_processor import DocumentProcessor
 
 
 def test_document_processor_init(temp_output_dir):

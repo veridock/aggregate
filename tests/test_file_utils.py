@@ -3,7 +3,7 @@ Tests for file_utils module.
 """
 import pytest
 from pathlib import Path
-from processor.utils.file_utils import search_svg_files
+from enclose.utils.file_utils import search_svg_files
 
 
 def test_search_svg_files(example_markdown_file, temp_output_dir):
