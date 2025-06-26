@@ -17,8 +17,13 @@ def test_cli_list_command(capsys):
     # Mock command line arguments
     test_args = ["--list"]
 
+    # Ensure the parent directory is in the Python path
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    
     # Import the main module and run with test arguments
-    import processor.__main__ as main
+    import enclose.__main__ as main
 
     # Save original sys.argv
     original_argv = sys.argv
@@ -51,7 +56,7 @@ def test_cli_convert_command(temp_output_dir):
     test_args = [str(test_md), "pdf", "--output", output_pdf]
 
     # Import the main module and run with test arguments
-    import processor.__main__ as main
+    import enclose.__main__ as main
 
     # Save original sys.argv
     original_argv = sys.argv
@@ -81,7 +86,7 @@ def test_cli_process_command(temp_output_dir, monkeypatch):
     test_args = ["--step", "process", "--output", str(temp_output_dir)]
     
     # Import the main module
-    import processor.__main__ as main
+    import enclose.__main__ as main
     
     # Save original sys.argv
     original_argv = sys.argv

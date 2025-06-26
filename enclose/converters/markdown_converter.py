@@ -53,20 +53,23 @@ def markdown_to_pdf(md_file, output_dir, output_file=None):
     """Convert markdown to PDF.
     
     Args:
-        md_file: Path to the input markdown file
+        md_file: Path or string to the input markdown file
         output_dir: Directory to save the output PDF
         output_file: Optional output filename (without extension)
         
     Returns:
         Path to the generated PDF file
     """
+    # Convert string paths to Path objects
+    md_file = Path(md_file) if not isinstance(md_file, Path) else md_file
+    output_dir = Path(output_dir) if not isinstance(output_dir, Path) else output_dir
+    
     # Ensure output directory exists
-    output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Determine output filename
     if output_file is None:
-        output_file = Path(md_file).stem
+        output_file = md_file.stem
     if not output_file.endswith('.pdf'):
         output_file = f"{output_file}.pdf"
     
