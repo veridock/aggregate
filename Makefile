@@ -64,9 +64,9 @@ endef
 
 # Install the package in development mode
 install:
-	@echo -e "$(BLUE)Installing text2file in development mode...$(NC)"
+	@echo -e "$(BLUE)Installing enclose in development mode...$(NC)"
 	poetry install
-	@echo -e "\n$(GREEN)Installation complete! You can now use the 'text2file' command.$(NC)"
+	@echo -e "\n$(GREEN)Installation complete! You can now use the 'enclose' command.$(NC)"
 
 # Install development dependencies
 install-dev:
