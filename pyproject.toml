@@ -1,0 +1,24 @@
+[project]
+name = "aggregator"
+version = "0.1.1"
+description = "Data aggregation tool"
+authors = [
+    { name = "Tom", email = "info@softreck.dev" }
+]
+requires-python = ">=3.8"
+
+[project.urls]
+homepage = "http://www.veridock.com"
+
+[project.scripts]
+aggregator = "aggregator.__main__:main"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
