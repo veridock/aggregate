@@ -42,14 +42,19 @@ def enclose_to_html_table(svg_files_data, html_path):
     for svg_data in svg_files_data:
         # Create thumbnail
         thumbnail_html = '<div class="thumbnail">SVG Preview</div>'
-        if os.path.exists(svg_data["path"]):
-            try:
+        
+        # Skip if svg_data is not a dictionary or doesn't have a path
+        if not isinstance(svg_data, dict) or "path" not in svg_data:
+            continue
+            
+        try:
+            if os.path.exists(svg_data["path"]):
                 with open(svg_data["path"], 'r') as f:
                     svg_content = f.read()
                 # Embed SVG directly as thumbnail
                 thumbnail_html = f'<div class="thumbnail">{svg_content}</div>'
-            except Exception:
-                pass
+        except Exception:
+            continue
 
         has_pdf = "✓" if svg_data.get("has_pdf_data") else "✗"
         has_metadata = "✓" if svg_data.get("has_metadata") else "✗"

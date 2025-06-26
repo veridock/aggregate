@@ -1,8 +1,7 @@
-"""
-Tests for html_utils module.
-"""
-import pytest
+"""Tests for html_utils module."""
+
 from pathlib import Path
+
 from enclose.utils.html_utils import enclose_to_html_table
 
 
@@ -41,11 +40,11 @@ def test_enclose_to_html_table(temp_output_dir):
     html_path = temp_output_dir / "dashboard.html"
     result_path = enclose_to_html_table(svg_files_data, html_path)
     
-    # Check if HTML file was created
+    # Check if HTML file was created and has content
     assert result_path == html_path
     assert html_path.exists()
-    assert html_path.stat().size > 0
-    
+    assert html_path.stat().st_size > 0
+
     # Check HTML content
     content = html_path.read_text()
     assert "<title>SVG Files Dashboard</title>" in content
