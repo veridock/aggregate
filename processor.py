@@ -260,7 +260,7 @@ Thank you for your business!
 
         return svg_files
 
-    def aggregate_to_html_table(self, svg_files_data):
+    def enclose_to_html_table(self, svg_files_data):
         """Step 7: Create HTML table with SVG thumbnails"""
         html_content = """<!DOCTYPE html>
 <html>
@@ -351,7 +351,7 @@ Thank you for your business!
 
 def main():
     parser = argparse.ArgumentParser(description="Document Processing Pipeline")
-    parser.add_argument("--step", choices=["create", "process", "aggregate", "search"],
+    parser.add_argument("--step", choices=["create", "process", "enclose", "search"],
                         required=True, help="Processing step to execute")
     parser.add_argument("--output", default="output", help="Output directory")
 
@@ -380,10 +380,10 @@ def main():
         svg_files = processor.search_svg_files()
         processor.save_metadata(svg_files, "svg_search_results.json")
 
-    elif args.step == "aggregate":
+    elif args.step == "enclose":
         # Step 7: Create dashboard
         svg_files = processor.search_svg_files()
-        processor.aggregate_to_html_table(svg_files)
+        processor.enclose_to_html_table(svg_files)
 
 
 if __name__ == "__main__":

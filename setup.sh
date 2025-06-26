@@ -4,8 +4,8 @@
 echo "Setting up Document Processing Pipeline..."
 
 # Create project directory
-mkdir -p aggregate
-cd aggregate
+mkdir -p enclose
+cd enclose
 
 # Check if running on Linux or macOS
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -46,5 +46,5 @@ echo "Next steps:"
 echo "1. Run 'make install' to install Python dependencies"
 echo "2. Run 'make create' to create example files"
 echo "3. Run 'make process' to run the full pipeline"
-echo "4. Run 'make aggregate' to create the dashboard"
+echo "4. Run 'make enclose' to create the dashboard"
 echo "5. Run 'make help' for all available commands"

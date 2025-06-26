@@ -3,7 +3,7 @@
 ## 📁 Initial Project Structure
 
 ```
-aggregate/
+enclose/
 ├── 📄 Makefile                    # Build automation and workflow
 ├── 🐍 processor.py               # Main Python processing pipeline
 ├── 📋 requirements.txt           # Python package dependencies
@@ -14,7 +14,7 @@ aggregate/
 ## 📁 After Installation (`make install`)
 
 ```
-aggregate/
+enclose/
 ├── 📄 Makefile
 ├── 🐍 processor.py
 ├── 📋 requirements.txt
@@ -34,7 +34,7 @@ aggregate/
 ## 📁 After Running Pipeline (`make all`)
 
 ```
-aggregate/
+enclose/
 ├── 📄 Makefile
 ├── 🐍 processor.py
 ├── 📋 requirements.txt
@@ -56,13 +56,13 @@ aggregate/
 ## 📁 Complete File Tree with Details
 
 ```
-aggregate/
+enclose/
 │
 ├── 📄 Makefile                    # 2KB - Build automation
 │   ├── install target            # Setup virtual environment
 │   ├── create target             # Generate example files
 │   ├── process target            # Run conversion pipeline
-│   ├── aggregate target          # Create dashboard
+│   ├── enclose target          # Create dashboard
 │   ├── search target             # Find SVG files
 │   └── clean targets             # Cleanup commands
 │
@@ -74,7 +74,7 @@ aggregate/
 │   ├── svg_to_png()             # Step 4: PDF → PNG extraction
 │   ├── process_ocr()            # Step 5: OCR processing
 │   ├── search_svg_files()       # Step 6: File system search
-│   ├── aggregate_to_html_table() # Step 7: Dashboard creation
+│   ├── enclose_to_html_table() # Step 7: Dashboard creation
 │   └── save_metadata()          # JSON metadata management
 │
 ├── 📋 requirements.txt           # 1KB - Python dependencies
@@ -194,7 +194,7 @@ Python Packages:
 For development and customization:
 
 ```
-aggregate/
+enclose/
 ├── .gitignore        # Git ignore patterns
 ├── .env.example      # Environment variables template
 ├── tests/           # Unit tests directory

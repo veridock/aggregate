@@ -73,8 +73,8 @@ brew install tesseract poppler cairo
 ### Quick Setup
 ```bash
 # Clone or download the project files
-git clone https://github.com/veridock/aggregate.git
-cd aggregate
+git clone https://github.com/veridock/enclose.git
+cd enclose
 
 # Install dependencies
 make install
@@ -114,10 +114,10 @@ make all
    - Performs OCR processing
    - Creates metadata JSON
 
-3. **Search & Aggregate**
+3. **Search & enclose**
    ```bash
    make search     # Find all SVG files
-   make aggregate  # Create dashboard
+   make enclose  # Create dashboard
    ```
 
 4. **View Results**
@@ -131,13 +131,13 @@ make all
 python processor.py --step create
 python processor.py --step process
 python processor.py --step search
-python processor.py --step aggregate
+python processor.py --step enclose
 ```
 
 ## 📁 Project Structure
 
 ```
-aggregate/
+enclose/
 ├── Makefile                 # Build automation
 ├── processor.py            # Main processing pipeline
 ├── requirements.txt        # Python dependencies
@@ -231,7 +231,7 @@ Step 7: DASHBOARD CREATION
 | `create` | Create example markdown file |
 | `process` | Run conversion pipeline (steps 2-5) |
 | `search` | Search filesystem for SVG files |
-| `aggregate` | Create HTML dashboard |
+| `enclose` | Create HTML dashboard |
 | `clean` | Remove generated files |
 | `clean-all` | Remove everything including venv |
 | `help` | Show available commands |

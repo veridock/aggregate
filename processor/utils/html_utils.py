@@ -7,7 +7,7 @@ import webbrowser
 from pathlib import Path
 
 
-def aggregate_to_html_table(svg_files_data, html_path):
+def enclose_to_html_table(svg_files_data, html_path):
     """Create HTML table with SVG thumbnails."""
     html_content = """<!DOCTYPE html>
 <html>

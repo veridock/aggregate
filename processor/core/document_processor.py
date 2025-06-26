@@ -12,7 +12,7 @@ from ..converters.markdown_converter import create_example_markdown, markdown_to
 from ..converters.pdf_converter import pdf_to_svg, svg_to_png
 from ..utils.ocr_processor import process_ocr
 from ..utils.file_utils import search_svg_files
-from ..utils.html_utils import aggregate_to_html_table
+from ..utils.html_utils import enclose_to_html_table
 from ..utils.metadata_utils import save_metadata
 
 
@@ -52,10 +52,10 @@ class DocumentProcessor:
         """Search filesystem for SVG files and their metadata."""
         return search_svg_files(search_path)
 
-    def aggregate_to_html_table(self, svg_files_data):
+    def enclose_to_html_table(self, svg_files_data):
         """Create HTML table with SVG thumbnails."""
         html_path = self.output_dir / "dashboard.html"
-        return aggregate_to_html_table(svg_files_data, html_path)
+        return enclose_to_html_table(svg_files_data, html_path)
 
     def save_metadata(self, metadata, filename="metadata.json"):
         """Save metadata to JSON file."""
