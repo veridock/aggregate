@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "enclose"
-version = "1.0.0"
+version = "1.0.1"
 description = "A modular document processing pipeline for Markdown to PDF/SVG/PNG conversion with OCR"
 authors = ["Tom <info@softreck.dev>"]
 readme = "README.md"
