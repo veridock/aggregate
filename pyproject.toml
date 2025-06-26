@@ -1,6 +1,6 @@
 [project]
 name = "group"
-version = "0.1.3"
+version = "0.1.4"
 description = "Data aggregation tool"
 authors = [
     { name = "Tom", email = "info@softreck.dev" }
