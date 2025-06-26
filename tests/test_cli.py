@@ -74,7 +74,7 @@ def test_cli_convert_command(temp_output_dir):
 def test_cli_process_command(temp_output_dir, monkeypatch):
     """Test the 'process' command."""
     # First create an example markdown file
-    from processor.converters.markdown_converter import create_example_markdown
+    from enclose.converters.markdown_converter import create_example_markdown
     create_example_markdown(temp_output_dir)
     
     # Mock command line arguments
@@ -88,7 +88,7 @@ def test_cli_process_command(temp_output_dir, monkeypatch):
     
     try:
         # Set test arguments
-        sys.argv = ["processor"] + test_args
+        sys.argv = ["enclose"] + test_args
         
         # Run the main function
         main.main()
