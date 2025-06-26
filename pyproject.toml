@@ -11,7 +11,7 @@ readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/veridock/aggregate"
 packages = [
-    { include = "processor", from = "src" },
+    { include = "processor" },
 ]
 
 [tool.poetry.dependencies]
