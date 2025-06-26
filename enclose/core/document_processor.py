@@ -11,7 +11,7 @@ import webbrowser
 from pathlib import Path
 from datetime import datetime
 
-from ..converters.markdown_converter import create_example_markdown, markdown_to_pdf
+from ..converters.markdown_converter import create_example_markdown, markdown_to_pdf, markdown_to_html
 from ..converters.pdf_converter import pdf_to_svg, svg_to_png
 from ..utils.ocr_processor import process_ocr
 from ..utils.file_utils import search_svg_files as utils_search_svg_files
@@ -86,8 +86,11 @@ class DocumentProcessor:
         
         # Handle different conversion paths
         try:
-            if input_format == 'md' and output_format == 'pdf':
-                return self.markdown_to_pdf(input_path, output_path)
+            if input_format == 'md':
+                if output_format == 'pdf':
+                    return self.markdown_to_pdf(input_path, output_path)
+                elif output_format == 'html':
+                    return self.markdown_to_html(input_path, output_path)
             elif input_format == 'pdf' and output_format == 'svg':
                 return self.pdf_to_svg(input_path, output_path)
             elif input_format == 'svg' and output_format == 'png':
@@ -103,25 +106,17 @@ class DocumentProcessor:
         """Create an example markdown file."""
         return Path(create_example_markdown(self.output_dir))
 
-    def markdown_to_pdf(self, md_file: Union[str, Path], output_path: Optional[Union[str, Path]] = None) -> Path:
-        """
-        Convert markdown to PDF.
+    def markdown_to_pdf(self, input_path: Union[str, Path], output_path: Union[str, Path]) -> str:
+        """Convert a markdown file to PDF.
         
         Args:
-            md_file: Path to the markdown file
-            output_path: Optional output path for the PDF
+            input_path: Path to the input markdown file
+            output_path: Path where the output PDF will be saved
             
         Returns:
             Path to the generated PDF file
         """
-        md_file = Path(md_file)
-        if output_path is None:
-            output_dir = Path(self.default_output_dir)
-            output_filename = f"{md_file.stem}.pdf"
-            output_path = output_dir / output_filename
-        else:
-            output_path = Path(output_path)
-            output_dir = output_path.parent
+        return markdown_to_pdf(input_path, output_path.parent, output_path.stem)
             output_filename = output_path.name
         
         # Ensure output directory exists
