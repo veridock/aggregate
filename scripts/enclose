@@ -1,0 +1,86 @@
+#!/bin/bash
+# Wrapper script for the enclose command that uses the local Poetry environment
+
+# Function to resolve the real path of this script, following symlinks
+resolve_script_path() {
+    local SOURCE="${BASH_SOURCE[0]}"
+    # Resolve $SOURCE until the file is no longer a symlink
+    while [ -h "$SOURCE" ]; do
+        local DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
+        local SOURCE="$(readlink "$SOURCE")"
+        # If $SOURCE was a relative symlink, resolve it relative to the directory
+        [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+    done
+    echo "$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
+}
+
+# Get the directory containing this script, resolving symlinks
+SCRIPT_DIR="$(resolve_script_path)"
+
+# The project root is the parent directory of the scripts directory
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Debug information (can be enabled by setting DEBUG=1)
+if [ -n "${DEBUG:-}" ]; then
+    echo "SCRIPT_DIR: $SCRIPT_DIR" >&2
+    echo "PROJECT_ROOT: $PROJECT_ROOT" >&2
+    echo "Current directory: $(pwd)" >&2
+fi
+
+# Verify we can find the project files
+if [ ! -f "$PROJECT_ROOT/pyproject.toml" ]; then
+    echo "Error: Could not find pyproject.toml in the expected location: $PROJECT_ROOT/" >&2
+    echo "Make sure the script is located in the project's scripts/ directory" >&2
+    exit 1
+fi
+
+# Check if Poetry is available
+if ! command -v poetry &> /dev/null; then
+    echo "Error: Poetry is not installed or not in PATH" >&2
+    exit 1
+fi
+
+# Function to run the command with the correct Python path
+run_enclose() {
+    # Store the current directory
+    local ORIGINAL_DIR="$(pwd)"
+    
+    # Change to the project directory
+    cd "$PROJECT_ROOT" || { 
+        echo "Error: Could not change to project directory: $PROJECT_ROOT" >&2
+        return 1
+    }
+    
+    # Get the path to the Python interpreter in the Poetry environment
+    local PYTHON_BIN
+    PYTHON_BIN="$(poetry env info -p 2>/dev/null)/bin/python"
+    
+    if [ ! -f "$PYTHON_BIN" ]; then
+        echo "Error: Could not find Python in Poetry environment" >&2
+        echo "Make sure you have run 'poetry install' in the project directory" >&2
+        cd "$ORIGINAL_DIR" || true
+        return 1
+    fi
+    
+    # Run the command with the correct Python path and PYTHONPATH
+    if [ -n "${DEBUG:-}" ]; then
+        echo "Using Python: $PYTHON_BIN" >&2
+        echo "PYTHONPATH: $PROJECT_ROOT" >&2
+    fi
+    
+    PYTHONPATH="$PROJECT_ROOT" \
+    "$PYTHON_BIN" -m processor.__main__ "$@"
+    local STATUS=$?
+    
+    # Change back to the original directory
+    cd "$ORIGINAL_DIR" || true
+    
+    return $STATUS
+}
+
+# Run the command and capture the exit status
+run_enclose "$@"
+EXIT_STATUS=$?
+
+# Exit with the captured status
+exit $EXIT_STATUS

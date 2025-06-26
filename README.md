@@ -1,38 +1,17 @@
 # Enclose
 
-A modular document processing pipeline for Markdown to PDF/SVG/PNG conversion with OCR capabilities.
+A comprehensive document processing pipeline for Markdown to PDF/SVG/PNG conversion with OCR capabilities.
 
-## 🏗️ Refactored Package Structure
-
-The codebase has been restructured into a modular Python package:
-
+```mermaid
+graph LR
+    A[Markdown] -->|Parse| B[HTML]
+    B -->|Convert| C[PDF]
+    C -->|Embed| D[SVG]
+    D -->|Extract| E[PNG]
+    E -->|Process| F[OCR]
+    F -->|Index| G[Search]
+    G -->|Visualize| H[Dashboard]
 ```
-processor/
-├── __init__.py          # Package initialization
-├── __main__.py          # CLI entry point
-├── core/
-│   ├── __init__.py
-│   └── document_processor.py  # Main processor class
-├── converters/
-│   ├── __init__.py
-│   ├── markdown_converter.py  # Markdown to PDF conversion
-│   └── pdf_converter.py       # PDF to SVG/PNG conversion
-└── utils/
-    ├── __init__.py
-    ├── ocr_processor.py       # OCR processing
-    ├── file_utils.py          # File operations
-    ├── html_utils.py          # HTML generation
-    └── metadata_utils.py      # Metadata handling
-```
-
-This modular structure provides better:
-- Code organization and maintainability
-- Separation of concerns
-- Testability
-- Reusability of components
-- Easier extension of functionality
-
-A comprehensive document processing system that converts Markdown files through a complete pipeline: Markdown → PDF → SVG → PNG → OCR → Search → Dashboard.
 
 ## 🚀 Features
 
@@ -41,105 +20,153 @@ A comprehensive document processing system that converts Markdown files through 
 - **Image extraction**: PDF pages converted to PNG with base64 encoding
 - **OCR processing**: Text extraction with confidence scoring
 - **Metadata tracking**: JSON metadata throughout the pipeline
-- **File system search**: Automatic SVG file discovery
-- **Interactive dashboard**: HTML table with SVG thumbnails
-- **Automated workflow**: Makefile-driven pipeline
+- **Interactive dashboard**: View and search processed documents
 
-## 📋 Prerequisites
+## 📚 Documentation
 
-### System Dependencies
+For complete documentation, please visit our [documentation site](docs/index.md).
 
-**Ubuntu/Debian:**
-```bash
-sudo apt-get update
-sudo apt-get install -y tesseract-ocr poppler-utils libcairo2-dev
-```
+## 🛠️ Quick Start
 
-**macOS:**
-```bash
-brew install tesseract poppler cairo
-```
+### Prerequisites
 
-**Windows:**
-- Install [Tesseract OCR](https://github.com/tesseract-ocr/tesseract)
-- Install [Poppler](https://poppler.freedesktop.org/)
-
-### Python Requirements
 - Python 3.8.1+
 - [Poetry](https://python-poetry.org/) for dependency management
+- System dependencies (see [Installation Guide](docs/getting-started/installation.md))
 
-## 🛠️ Installation
+### Installation
 
-### Using Make (Recommended)
 ```bash
 # Clone the repository
 git clone https://github.com/veridock/enclose.git
 cd enclose
 
-# Install the package in development mode
+# Install the package
 make install
 ```
 
-### Using Poetry Directly
-```bash
-# Install dependencies
-poetry install
+### Basic Usage
 
-# Activate the virtual environment
-poetry shell
+```bash
+# Process a document
+enclose process example.md -o output/
+
+# View the results
+open output/dashboard.html  # macOS
+# or
+xdg-open output/dashboard.html  # Linux
 ```
 
-## 🎯 Usage
+## 📖 Documentation Structure
 
-### Quick Start
+- [Getting Started](docs/getting-started/installation.md) - Installation and setup
+- [User Guide](docs/usage/cli.md) - Command reference and usage examples
+- [Architecture](docs/architecture/overview.md) - System design and components
+- [Development](development/setup.md) - Contributing and development setup
+
+## 🌟 Features in Detail
+
+### Document Conversion
+- Markdown to PDF with custom styling
+- PDF to SVG with embedded fonts
+- High-quality image extraction
+
+### Advanced Processing
+- OCR text extraction with confidence scoring
+- Metadata extraction and management
+- Batch processing support
+
+### Command Line Interface
+- Intuitive command structure
+- Configurable output formats
+- Progress tracking
+
+## 📊 Example Workflow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI
+    participant Processor
+    
+    User->>CLI: enclose process doc.md
+    CLI->>Processor: Process document
+    Processor->>Processor: Convert Markdown to PDF
+    Processor->>Processor: Generate SVG with embedded PDF
+    Processor->>Processor: Extract images
+    Processor->>Processor: Process OCR
+    Processor-->>CLI: Processing complete
+    CLI-->>User: Results in output/
+```
+
+## 📦 Project Structure
+
+```
+enclose/
+├── docs/                   # Documentation
+├── processor/              # Main package
+│   ├── __init__.py
+│   ├── __main__.py         # CLI entry point
+│   ├── core/               # Core processing logic
+│   ├── converters/         # Format converters
+│   └── utils/              # Utility functions
+├── scripts/                # Helper scripts
+├── tests/                  # Test suite
+└── pyproject.toml          # Project configuration
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see our [Contributing Guide](docs/development/contributing.md) for details.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🧪 Testing
+
+To run the test suite:
+
 ```bash
-# Process documents
-enclose process input.md output/
-
-# Run tests
 make test
-
-# Format code
-make format
-
-# Check code quality
 make lint
 ```
 
-### Step-by-Step Execution
+## 🔄 Development Workflow
 
-1. **Create Example Files**
+1. **Set up development environment**
    ```bash
-   make create
-   ```
-   - Generates `invoice_example.md`
-
-2. **Process Documents**
-   ```bash
-   make process
-   ```
-   - Converts MD → PDF → SVG → PNG
-   - Performs OCR processing
-   - Creates metadata JSON
-
-3. **Search & enclose**
-   ```bash
-   make search     # Find all SVG files
-   make enclose  # Create dashboard
+   make install
    ```
 
-4. **View Results**
+2. **Run tests**
+   ```bash
+   make test
+   ```
+
+3. **Format and check code**
+   ```bash
+   make format
+   make lint
+   ```
+
+4. **Run the development server**
+   ```bash
+   make dev
+   ```
    - Dashboard opens automatically in browser
    - Access: `output/dashboard.html`
 
-### Individual Commands
+## 🛠️ CLI Commands
 
 ```bash
-# Python script direct usage
-python processor.py --step create
-python processor.py --step process
-python processor.py --step search
-python processor.py --step enclose
+# Process a document
+enclose process input.md -o output/
+
+# List supported formats
+enclose --list
+# Show help
+enclose --help
 ```
 
 ## 📁 Project Structure
@@ -147,20 +174,23 @@ python processor.py --step enclose
 ```
 enclose/
 ├── Makefile                 # Build automation
-├── processor.py            # Main processing pipeline
-├── requirements.txt        # Python dependencies
-├── setup.sh               # System setup script
-├── README.md              # Project documentation
-├── venv/                  # Virtual environment (created)
-└── output/                # Generated files (created)
-    ├── invoice_example.md     # Source markdown
-    ├── invoice_example.pdf    # Generated PDF
-    ├── invoice_example.svg    # SVG with embedded PDF
-    ├── page_1.png            # Extracted PNG pages
-    ├── page_N.png            # (multiple pages if needed)
-    ├── metadata.json         # Processing metadata
-    ├── svg_search_results.json # Search results
-    └── dashboard.html        # Interactive dashboard
+├── pyproject.toml          # Project configuration and dependencies
+├── README.md               # Project documentation
+├── scripts/
+│   └── enclose            # Global CLI wrapper script
+├── processor/              # Main package
+│   ├── __init__.py
+│   ├── __main__.py         # CLI entry point
+│   ├── core/               # Core processing logic
+│   ├── converters/         # File format converters
+│   └── utils/              # Utility functions
+└── output/                 # Generated files (created on first run)
+    ├── example.md          # Example markdown
+    ├── example.pdf         # Generated PDF
+    ├── example.svg         # SVG with embedded PDF
+    ├── page_1.png         # Extracted PNG pages
+    ├── metadata.json       # Processing metadata
+    └── dashboard.html      # Interactive dashboard
 ```
 
 ## 🔄 Pipeline Workflow

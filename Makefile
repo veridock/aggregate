@@ -3,12 +3,11 @@
 # Enhanced with universal converter capabilities and development tools
 
 SHELL := /bin/bash
-PYTHON := python3
-PIP := pip3
-VENV := venv
+PYTHON := poetry run python
+PIP := poetry run pip
+VENV := $(shell poetry env info -p 2>/dev/null || echo "venv")
 ACTIVATE := $(VENV)/bin/activate
 OUTPUT_DIR := output
-CONVERTER_DIR := ./converters
 CONFIG_DIR := ./config
 
 # Color definitions for output
@@ -39,21 +38,23 @@ endef
 
 # Default target
 .PHONY: all
-all: install create process aggregate search
-	$(call log_success,Document processing pipeline completed successfully!)
+all: install test
+	$(call log_success,Project setup and tests completed successfully!)
 
-# Install all required dependencies
+# Install all required dependencies using Poetry
 .PHONY: install
-install: $(VENV)/bin/activate install-system-deps
-	$(call log_info,Installing Python dependencies...)
-	. $(ACTIVATE) && $(PIP) install --upgrade pip setuptools wheel
-	. $(ACTIVATE) && $(PIP) install -r requirements.txt
+install: install-system-deps
+	$(call log_info,Installing Python dependencies using Poetry...)
+	poetry install --with dev
 	$(call log_success,Dependencies installed successfully!)
 
 # Create virtual environment
-$(VENV)/bin/activate:
-	$(call log_info,Creating virtual environment...)
-	$(PYTHON) -m venv $(VENV)
+.PHONY: venv
+venv:
+	$(call log_info,Ensuring Poetry environment is ready...)
+	poetry env use python3
+	poetry install --with dev
+	$(call log_success,Poetry environment is ready)
 
 # Install system dependencies
 .PHONY: install-system-deps
@@ -63,13 +64,17 @@ install-system-deps:
 		bash $(CONFIG_DIR)/install_dependencies.sh; \
 	else \
 		echo -e "$(YELLOW)[WARN]$(NC) System dependency installer not found"; \
+		echo -e "$(YELLOW)[WARN]$(NC) Please ensure the following system dependencies are installed:"; \
+		echo -e "  - poppler-utils (for pdf2image)"; \
+		echo -e "  - tesseract-ocr (for OCR)"; \
+		echo -e "  - python3-dev (for building dependencies)"; \
 	fi
 
 # Development environment setup
 .PHONY: install-dev
 install-dev: install
 	$(call log_info,Installing development dependencies...)
-	. $(ACTIVATE) && $(PIP) install \
+	poetry run pip install \
 		black>=22.3.0 \
 		isort>=5.10.1 \
 		flake8>=5.0.0 \
@@ -82,28 +87,28 @@ install-dev: install
 .PHONY: create
 create:
 	$(call log_info,Creating example markdown file...)
-	. $(ACTIVATE) && $(PYTHON) processor.py --step create
+	poetry run python processor.py --step create
 	$(call log_success,Example files created!)
 
 # Process documents through the pipeline
 .PHONY: process
 process:
 	$(call log_info,Processing documents through pipeline...)
-	. $(ACTIVATE) && $(PYTHON) processor.py --step process
+	poetry run python processor.py --step process
 	$(call log_success,Processing completed!)
 
 # Aggregate results
 .PHONY: aggregate
 aggregate:
 	$(call log_info,Aggregating results...)
-	. $(ACTIVATE) && $(PYTHON) processor.py --step aggregate
+	poetry run python processor.py --step aggregate
 	$(call log_success,Aggregation completed!)
 
 # Search metadata
 .PHONY: search
 search:
 	$(call log_info,Searching metadata...)
-	. $(ACTIVATE) && $(PYTHON) processor.py --step search
+	poetry run python processor.py --step search
 	$(call log_success,Search completed!)
 
 # Universal file conversion function
@@ -140,66 +145,83 @@ pdf-convert:
 .PHONY: format
 format:
 	$(call log_info,Formatting code...)
-	. $(ACTIVATE) && black processor.py
-	. $(ACTIVATE) && isort processor.py
-	$(call log_success,Code formatting completed!)
+	poetry run black processor/ tests/
+	poetry run isort processor/ tests/
+	$(call log_success,Code formatted!)
 
 # Code linting
 .PHONY: lint
 lint:
 	$(call log_info,Linting code...)
-	. $(ACTIVATE) && flake8 processor.py --max-line-length=88 --extend-ignore=E203,W503
-	. $(ACTIVATE) && mypy processor.py --ignore-missing-imports
-	$(call log_success,Linting completed!)
+	poetry run flake8 processor/ tests/
+	poetry run mypy processor/ tests/
+	$(call log_success,Linting complete!)
 
 # Run tests
 .PHONY: test
-test: install
+test:
 	$(call log_info,Running tests...)
-	. $(ACTIVATE) && python test_environment.py
-	@if [ -f "tests/test_processor.py" ]; then \
-		. $(ACTIVATE) && pytest tests/ -v --cov=processor; \
-	else \
-		$(call log_warn,No tests found, running environment verification only); \
-	fi
-	$(call log_success,Tests completed!)
+	poetry run pytest -v --cov=processor tests/
+
+# Run tests with coverage report
+.PHONY: coverage
+coverage:
+	$(call log_info,Running tests with coverage...)
+	poetry run pytest --cov=processor --cov-report=html tests/
+	$(call log_success,Coverage report generated in htmlcov/)
+
+# Clean up build artifacts
+.PHONY: clean
+clean:
+	$(call log_info,Cleaning up build artifacts...)
+	rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .coverage htmlcov/ .mypy_cache/
+	find . -type d -name "__pycache__" -exec rm -r {} +
+	find . -type f -name "*.py[co]" -delete
+	$(call log_success,Cleaned up build artifacts)
 
 # Benchmark the pipeline
 .PHONY: benchmark
 benchmark:
 	$(call log_info,Running pipeline benchmark...)
-	. $(ACTIVATE) && time $(PYTHON) processor.py --step process
-	$(call log_success,Benchmark completed!)
+	@echo -e "$(YELLOW)Running document processing benchmark...$(NC)"
+	@echo -e "$(CYAN)Processing markdown to PDF...$(NC)"
+	@time poetry run enclose test.md pdf -o benchmark_output.pdf
+	@echo -e "\n$(CYAN)Processing PDF to SVG...$(NC)"
+	@time poetry run enclose benchmark_output.pdf svg -o benchmark_output.svg
+	@echo -e "\n$(CYAN)Processing SVG to PNG...$(NC)"
+	@time poetry run enclose benchmark_output.svg png -o benchmark_output.png
+	$(call log_success,Benchmark completed! Results in benchmark_output.*)
 
 # Validate output files
 .PHONY: validate
 validate:
 	$(call log_info,Validating output files...)
 	@if [ -d "$(OUTPUT_DIR)" ]; then \
-		for file in $(OUTPUT_DIR)/*.pdf; do \
-			if [ -f "$file" ]; then \
-				echo "✓ PDF: $file"; \
-			fi; \
-		done; \
-		for file in $(OUTPUT_DIR)/*.svg; do \
-			if [ -f "$file" ]; then \
-				echo "✓ SVG: $file"; \
-			fi; \
-		done; \
-		for file in $(OUTPUT_DIR)/*.png; do \
-			if [ -f "$file" ]; then \
-				echo "✓ PNG: $file"; \
-			fi; \
-		done; \
-		for file in $(OUTPUT_DIR)/*.json; do \
-			if [ -f "$file" ]; then \
-				. $(ACTIVATE) && python -m json.tool "$file" > /dev/null && echo "✓ JSON: $file"; \
+		echo -e "$(GREEN)Found output directory: $(OUTPUT_DIR)$(NC)"; \
+		if command -v pdftotext >/dev/null; then \
+			for file in $(OUTPUT_DIR)/*.pdf; do \
+				if [ -f "$$file" ]; then \
+					if ! pdftotext "$$file" - &>/dev/null; then \
+						echo -e "$(RED)Invalid PDF: $$file$(NC)"; \
+						exit 1; \
+					else \
+						echo -e "$(GREEN)Valid PDF: $$file$(NC)"; \
+					fi; \
+				fi; \
+			done; \
+		else \
+			echo -e "$(YELLOW)pdftotext not found, skipping PDF validation$(NC)"; \
+		fi; \
+		for file in $(OUTPUT_DIR)/*.{svg,png}; do \
+			if [ -f "$$file" ]; then \
+				echo -e "$(GREEN)Found output file: $$file$(NC)"; \
 			fi; \
 		done; \
 	else \
-		$(call log_warn,Output directory not found); \
+		$(call log_warn,Output directory $(OUTPUT_DIR) does not exist); \
+		exit 1; \
 	fi
-	$(call log_success,Validation completed!)
+	$(call log_success,Output files validated successfully!)
 
 # List supported formats
 .PHONY: list-formats
@@ -327,28 +349,46 @@ interactive:
 	@echo "================================================"
 	@echo ""
 	@echo "Select an option:"
-	@echo "1. Create example and run full pipeline"
+	@echo "1. Run full pipeline (create → process → aggregate)"
 	@echo "2. Process existing files"
-	@echo "3. Create dashboard only"
-	@echo "4. Run tests"
+	@echo "3. Run tests"
+	@echo "4. Format and lint code"
 	@echo "5. Check system status"
-	@echo "6. Exit"
+	@echo "6. Clean build artifacts"
+	@echo "7. Exit"
 	@echo ""
-	@read -p "Enter choice (1-6): " choice; \
-	case $choice in \
-		1) $(MAKE) all ;; \
-		2) $(MAKE) process aggregate ;; \
-		3) $(MAKE) aggregate ;; \
-		4) $(MAKE) test ;; \
-		5) $(MAKE) status ;; \
-		6) echo "Goodbye!" ;; \
-		*) echo "Invalid choice" ;; \
+	@read -p "Enter choice (1-7): " choice; \
+	case "$$choice" in \
+		1) poetry run enclose test.md pdf -o output/document.pdf \
+		   && poetry run enclose output/document.pdf svg -o output/document.svg \
+		   && poetry run enclose output/document.svg png -o output/document.png \
+		   && echo -e "$(GREEN)Pipeline completed successfully!$(NC)" \
+		   && ls -l output/;; \
+		2) read -p "Enter input file path: " input_file; \
+		   read -p "Enter output format (pdf/svg/png): " output_format; \
+		   read -p "Enter output file path (optional): " output_file; \
+		   if [ -z "$$output_file" ]; then \
+			   poetry run enclose "$$input_file" "$$output_format"; \
+		   else \
+			   poetry run enclose "$$input_file" "$$output_format" -o "$$output_file"; \
+		   fi;; \
+		3) make test;; \
+		4) make format lint;; \
+		5) echo -e "$(CYAN)=== System Information ===$(NC)"; \
+		   echo "Python: $$(poetry run python --version)"; \
+		   echo "Poetry: $$(poetry --version)"; \
+		   echo "PDF Tools: $$(which pdftotext 2>/dev/null || echo 'Not installed')"; \
+		   echo "Tesseract: $$(which tesseract 2>/dev/null || echo 'Not installed')"; \
+		   echo -e "$(CYAN)=========================$(NC)";; \
+		6) make clean;; \
+		7) exit 0;; \
+		*) echo -e "$(RED)Invalid choice$(NC)"; exit 1;; \
 	esac
 
 # Help target with enhanced information
 .PHONY: help
 help:
-	@echo -e "$(BLUE)Document Processing Pipeline$(NC)"
+	@echo -e "$(BLUE)Document Processing Pipeline $(NC)"
 	@echo "================================="
 	@echo ""
 	@echo -e "$(CYAN)Core Pipeline:$(NC)"
@@ -372,6 +412,10 @@ help:
 	@echo "  pdf-convert   - PDF conversion"
 	@echo "  list-formats  - Show supported formats"
 	@echo ""
+	@echo -e "$(CYAN)Version Control:$(NC)"
+	@echo "  push          - Push changes to remote repository"
+	@echo "  commit       - Stage and commit changes"
+	@echo ""
 	@echo -e "$(CYAN)Utilities:$(NC)"
 	@echo "  validate      - Validate output files"
 	@echo "  check-system  - Check system requirements"
@@ -383,13 +427,47 @@ help:
 	@echo "  clean         - Remove generated files"
 	@echo "  clean-all     - Remove everything including venv"
 	@echo "  package       - Create distribution package"
+	@echo "  publish       - Publish package to PyPI and tag release"
 	@echo "  docs          - Generate documentation"
 	@echo ""
 	@echo -e "$(CYAN)Examples:$(NC)"
 	@echo "  make all                           # Complete pipeline"
 	@echo "  make convert CONVERTER=imagemagick FROM=jpg TO=png INPUT=image.jpg"
-	@echo "  make deploy SERVER=user@server     # Deploy to server"
-	@echo "  make monitor                       # Watch for changes"
+	@echo "  make push                         # Push changes to remote"
+	@echo "  make commit MSG='Update code'     # Commit changes with message"
+	@echo "  make monitor                      # Watch for changes"
+
+# Version Control
+.PHONY: push
+push:
+	@echo -e "$(BLUE)Pushing changes to remote repository...$(NC)"
+	@git push
+	@echo -e "$(GREEN)✓ Changes pushed successfully$(NC)"
+
+# Publish package to PyPI and tag release
+.PHONY: publish
+publish: test
+	@echo -e "$(BLUE)Building and publishing package to PyPI...$(NC)"
+	@poetry build
+	@poetry publish
+	@echo -e "$(GREEN)✓ Package published to PyPI successfully$(NC)"
+	@echo -e "$(BLUE)Creating git tag for the release...$(NC)"
+	@version=$$(poetry version -s); \
+	tag="v$$version"; \
+	git tag -a "$$tag" -m "Release $$tag"; \
+	git push origin "$$tag"; \
+	echo -e "$(GREEN)✓ Created and pushed tag $$tag to remote$(NC)"
+
+.PHONY: commit
+commit:
+	@if [ -z "$(MSG)" ]; then \
+		echo -e "$(RED)Error: Please provide a commit message with MSG='your message'$(NC)"; \
+		exit 1; \
+	fi
+	@echo -e "$(BLUE)Staging and committing changes...$(NC)"
+	@git add .
+	@git commit -m "$(MSG)"
+	@echo -e "$(GREEN)✓ Changes committed with message: $(YELLOW)$(MSG)$(NC)"
 
 # Prevent make from interpreting arguments as targets
 %:
