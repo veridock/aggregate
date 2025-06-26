@@ -117,14 +117,18 @@ class DocumentProcessor:
             Path to the generated PDF file
         """
         return markdown_to_pdf(input_path, output_path.parent, output_path.stem)
-            output_filename = output_path.name
         
-        # Ensure output directory exists
-        output_dir.mkdir(parents=True, exist_ok=True)
+    def markdown_to_html(self, input_path: Union[str, Path], output_path: Union[str, Path]) -> str:
+        """Convert a markdown file to HTML.
         
-        # Use the markdown_to_pdf function from converters and convert the result to Path
-        pdf_path = markdown_to_pdf(str(md_file), str(output_dir), output_filename)
-        return Path(pdf_path)
+        Args:
+            input_path: Path to the input markdown file
+            output_path: Path where the output HTML will be saved
+            
+        Returns:
+            Path to the generated HTML file
+        """
+        return markdown_to_html(input_path, output_path.parent, output_path.stem)
 
     def pdf_to_svg(self, pdf_file: Union[str, Path]) -> tuple[str, Dict[str, Any]]:
         """Convert PDF to SVG with embedded data and metadata."""
