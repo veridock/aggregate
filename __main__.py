@@ -3,11 +3,11 @@
 Main entry point for the enclose command.
 """
 
-from pathlib import Path
-import sys
-
-def main():
-    """Main entry point for the enclose command."""
+def cli():
+    """CLI entry point."""
+    from pathlib import Path
+    import sys
+    
     # Add the current directory to the Python path
     sys.path.insert(0, str(Path(__file__).parent))
     
@@ -50,5 +50,11 @@ def main():
         svg_files = processor.search_svg_files()
         processor.aggregate_to_html_table(svg_files)
 
+# This allows the script to be run with `python -m enclose`
 if __name__ == "__main__":
-    main()
+    cli()
+
+# This is the entry point for the console script
+def main():
+    """Entry point for the console script."""
+    cli()
