@@ -16,7 +16,7 @@ def cli():
     import argparse
     
     parser = argparse.ArgumentParser(description="Document Processing Pipeline")
-    parser.add_argument("--step", choices=["create", "process", "aggregate", "search"],
+    parser.add_argument("--step", choices=["create", "process", "enclose", "search"],
                       required=True, help="Processing step to execute")
     parser.add_argument("--output", default="output", help="Output directory")
     
@@ -45,10 +45,10 @@ def cli():
         svg_files = processor.search_svg_files()
         processor.save_metadata(svg_files, "svg_search_results.json")
     
-    elif args.step == "aggregate":
+    elif args.step == "enclose":
         # Step 7: Create dashboard
         svg_files = processor.search_svg_files()
-        processor.aggregate_to_html_table(svg_files)
+        processor.enclose_to_html_table(svg_files)
 
 # This allows the script to be run with `python -m enclose`
 if __name__ == "__main__":

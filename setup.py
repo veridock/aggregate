@@ -24,7 +24,7 @@ setup(
     long_description_content_type='text/markdown',
     author="Tom",
     author_email="info@softreck.dev",
-    url="https://github.com/veridock/aggregate",
+    url="https://github.com/veridock/enclose",
     packages=find_namespace_packages(include=['processor', 'processor.*']),
     py_modules=['__main__'],
     entry_points={

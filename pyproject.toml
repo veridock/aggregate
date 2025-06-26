@@ -14,7 +14,7 @@ readme = "README.md"
 license = {text = "MIT"}
 
 [project.urls]
-homepage = "https://github.com/veridock/aggregate"
+homepage = "https://github.com/veridock/enclose"
 
 [project.scripts]
 enclose = "__main__:main"

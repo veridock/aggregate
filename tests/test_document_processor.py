@@ -63,7 +63,7 @@ def test_full_processing_pipeline(example_markdown_file, temp_output_dir):
     assert len(svg_files) > 0
     
     # Step 7: Create HTML dashboard
-    html_path = processor.aggregate_to_html_table(svg_files)
+    html_path = processor.enclose_to_html_table(svg_files)
     assert html_path.exists()
     
     # Save metadata
